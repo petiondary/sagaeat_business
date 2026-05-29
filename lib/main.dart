@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 
 // =====================================================================
 //  SAGAEAT BUSINESS — UI/UX REFRESH (Material 3)
@@ -181,8 +183,406 @@ class SagaEatBusinessApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'SagaEat Business',
         theme: buildAppTheme(),
-        home: const DashboardScreen(),
+        home: const LoginScreen(),
       );
+}
+
+// ---------------------------------------------------------------------
+//  LOGIN SCREEN
+// ---------------------------------------------------------------------
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final _emailCtrl = TextEditingController();
+  final _passCtrl = TextEditingController();
+  bool _obscurePass = true;
+
+  @override
+  void dispose() {
+    _emailCtrl.dispose();
+    _passCtrl.dispose();
+    super.dispose();
+  }
+
+  void _login() {
+    if (_emailCtrl.text.trim().isEmpty || !_emailCtrl.text.contains('@')) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Tanpri antre yon imèl valid."),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
+    if (_passCtrl.text.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Modpas dwe gen omwen 6 karaktè."),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const DashboardScreen()),
+    );
+  }
+
+  InputDecoration _inputDeco(String label, IconData icon) =>
+      InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: AppPalette.seed, width: 2),
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppPalette.cream,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 48),
+              Center(
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  height: 180,
+                ),
+              ),
+              const SizedBox(height: 32),
+              Text(
+                "Konekte",
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: AppPalette.ink,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                "Konekte pou jere restoran ou a",
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 32),
+              TextField(
+                controller: _emailCtrl,
+                keyboardType: TextInputType.emailAddress,
+                decoration: _inputDeco("Imèl", Icons.email_outlined),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _passCtrl,
+                obscureText: _obscurePass,
+                decoration: _inputDeco(
+                  "Modpas",
+                  Icons.lock_outline_rounded,
+                ).copyWith(
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePass
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: Colors.grey[600],
+                    ),
+                    onPressed: () =>
+                        setState(() => _obscurePass = !_obscurePass),
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    "Bliye modpas ou?",
+                    style: TextStyle(color: AppPalette.seed),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              FilledButton.icon(
+                icon: const Icon(Icons.login_rounded),
+                label: const Text(
+                  "Konekte",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                ),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(52),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
+                ),
+                onPressed: _login,
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Pa gen kont encore? ",
+                    style: TextStyle(color: Colors.grey[700], fontSize: 14),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const RegisterScreen()),
+                    ),
+                    child: const Text(
+                      "Enskri",
+                      style: TextStyle(
+                        color: AppPalette.seed,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------
+//  REGISTER SCREEN
+// ---------------------------------------------------------------------
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  final _nomCtrl = TextEditingController();
+  final _prenomCtrl = TextEditingController();
+  final _emailCtrl = TextEditingController();
+  final _telCtrl = TextEditingController();
+  final _passCtrl = TextEditingController();
+  bool _obscurePass = true;
+
+  @override
+  void dispose() {
+    _nomCtrl.dispose();
+    _prenomCtrl.dispose();
+    _emailCtrl.dispose();
+    _telCtrl.dispose();
+    _passCtrl.dispose();
+    super.dispose();
+  }
+
+  void _register() {
+    if (_nomCtrl.text.trim().isEmpty || _prenomCtrl.text.trim().isEmpty) {
+      _showError("Tanpri antre non ak prenon ou.");
+      return;
+    }
+    if (_emailCtrl.text.trim().isEmpty ||
+        !_emailCtrl.text.contains('@')) {
+      _showError("Tanpri antre yon imèl valid.");
+      return;
+    }
+    final digits = _telCtrl.text.replaceAll(RegExp(r'\D'), '');
+    if (digits.length < 8) {
+      _showError("Nimewo telefòn dwe gen omwen 8 chif.");
+      return;
+    }
+    if (_passCtrl.text.length < 6) {
+      _showError("Modpas dwe gen omwen 6 karaktè.");
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Row(children: [
+          Icon(Icons.check_circle_rounded, color: Colors.white),
+          SizedBox(width: 10),
+          Text("Kont kreye avèk siksè!"),
+        ]),
+        backgroundColor: Colors.green[700],
+      ),
+    );
+    Navigator.pop(context);
+  }
+
+  void _showError(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(msg),
+      backgroundColor: Colors.red,
+    ));
+  }
+
+  InputDecoration _inputDeco(String label, IconData icon) =>
+      InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: AppPalette.seed, width: 2),
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppPalette.cream,
+      appBar: AppBar(
+        backgroundColor: AppPalette.cream,
+        elevation: 0,
+        leading: const BackButton(color: AppPalette.ink),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 8),
+              Center(
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  height: 110,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                "Kreye Kont",
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: AppPalette.ink,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                "Ranpli enfòmasyon yo pou kòmanse",
+                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 28),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _nomCtrl,
+                      textCapitalization: TextCapitalization.words,
+                      decoration: _inputDeco("Non", Icons.person_outlined),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _prenomCtrl,
+                      textCapitalization: TextCapitalization.words,
+                      decoration:
+                          _inputDeco("Prenon", Icons.person_outlined),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _emailCtrl,
+                keyboardType: TextInputType.emailAddress,
+                decoration: _inputDeco("Imèl", Icons.email_outlined),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _telCtrl,
+                keyboardType: TextInputType.phone,
+                decoration:
+                    _inputDeco("Nimewo Telefòn", Icons.phone_outlined),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _passCtrl,
+                obscureText: _obscurePass,
+                decoration: _inputDeco(
+                  "Modpas",
+                  Icons.lock_outline_rounded,
+                ).copyWith(
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePass
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: Colors.grey[600],
+                    ),
+                    onPressed: () =>
+                        setState(() => _obscurePass = !_obscurePass),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 28),
+              FilledButton.icon(
+                icon: const Icon(Icons.how_to_reg_rounded),
+                label: const Text(
+                  "Kreye Kont",
+                  style:
+                      TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                ),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(52),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
+                ),
+                onPressed: _register,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Deja gen kont? ",
+                    style: TextStyle(color: Colors.grey[700], fontSize: 14),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      "Konekte",
+                      style: TextStyle(
+                        color: AppPalette.seed,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 // ---------------------------------------------------------------------
@@ -204,9 +604,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _historyEmployeeFilter = "Tout";
   DateTimeRange? _historyDateRange;
 
+  // Filtè pou Onglet Finans
+  String _financeQuickFilter = "7 Jou";
+  DateTimeRange? _financeDateRange;
+  final List<Map<String, dynamic>> _expenses = [];
+
   // Filtè ak rechèch pou Onglet Plat
   String _searchQuery = "";
   String _stockSortOrder = "Tout";
+
+  // --- VARYAB POU PEMAN ---
+  final TextEditingController _moncashCtrl = TextEditingController();
+  final TextEditingController _natcashCtrl = TextEditingController();
+  final TextEditingController _bankNameCtrl = TextEditingController();
+  final TextEditingController _bankAccountCtrl = TextEditingController();
+  final TextEditingController _bankHolderCtrl = TextEditingController();
+
+  // --- VARYAB POU SEKIRITE ---
+  String _settingsPin = "";
+
+  // --- VARYAB POU ENPRIMANT BLUETOOTH ---
+  BluetoothInfo? _connectedPrinter;
 
   // --- VARYAB POU ONGLET PROFILE ---
   final TextEditingController _restNameController =
@@ -217,6 +635,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String? _selectedDept;
   String? _selectedCommune;
   final List<String> _deliveryZones = [];
+  String _zoneSearchQuery = "";
 
   // Done Jewografik Ayiti (10 Depatman ak Komin prensipal yo)
   final Map<String, List<String>> _haitiData = {
@@ -297,24 +716,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
   };
 
   // Lis anplwaye yo
-  List<Map<String, String>> staffList = [
+  List<Map<String, dynamic>> staffList = [
     {
       "name": "Mèt Dary",
       "role": "Cuisinier",
       "phone": "+509 3456-7890",
       "address": "Carrefour, Haiti",
+      "isAvailable": true,
     },
     {
       "name": "Jean Pierre",
       "role": "Livreur",
       "phone": "+509 3123-4567",
       "address": "Port-au-Prince, Haiti",
+      "isAvailable": true,
     },
     {
       "name": "Marie",
       "role": "Cuisinier & Livreur",
       "phone": "+509 3789-0123",
       "address": "Delmas, Haiti",
+      "isAvailable": true,
     },
   ];
 
@@ -355,6 +777,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         "date_completed": initStatus == "Livre"
             ? now.subtract(Duration(days: i)).add(const Duration(hours: 1))
             : null,
+        "date_disponib": initStatus == "Livre"
+            ? now.subtract(Duration(days: i)).add(const Duration(minutes: 45))
+            : null,
         "date_canceled": initStatus == "Annulé"
             ? now.subtract(Duration(days: i)).add(const Duration(minutes: 20))
             : null,
@@ -375,6 +800,56 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _formatDate(DateTime? dt) {
     if (dt == null) return "N/A";
     return "${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year} a ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}";
+  }
+
+  int _parsePrice(String pri) =>
+      int.tryParse(pri.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+
+  String _formatHTG(int amount) {
+    final s = amount.toString();
+    final result = StringBuffer();
+    for (int i = 0; i < s.length; i++) {
+      if (i > 0 && (s.length - i) % 3 == 0) result.write(',');
+      result.write(s[i]);
+    }
+    return 'HTG ${result.toString()}';
+  }
+
+  DateTimeRange _effectiveFinanceRange() {
+    if (_financeDateRange != null) return _financeDateRange!;
+    final now = DateTime.now();
+    switch (_financeQuickFilter) {
+      case "Jodi a":
+        return DateTimeRange(
+            start: DateTime(now.year, now.month, now.day), end: now);
+      case "7 Jou":
+        return DateTimeRange(
+            start: now.subtract(const Duration(days: 7)), end: now);
+      case "Mwa Sa":
+        return DateTimeRange(
+            start: DateTime(now.year, now.month, 1), end: now);
+      default:
+        return DateTimeRange(start: DateTime(2020), end: now);
+    }
+  }
+
+  Map<String, int> _groupByWeek(Map<String, int> daily) {
+    final result = <String, int>{};
+    int week = 1;
+    int count = 0;
+    int weekTotal = 0;
+    for (final e in daily.entries) {
+      weekTotal += e.value;
+      count++;
+      if (count == 7) {
+        result["S$week"] = weekTotal;
+        week++;
+        count = 0;
+        weekTotal = 0;
+      }
+    }
+    if (count > 0) result["S$week"] = weekTotal;
+    return result;
   }
 
   // Lis Plat
@@ -403,6 +878,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
       "name": "Griyo ak Bannan",
       "pri": 1500.0,
       "stock": 15,
+      "available": true,
+      "supplements": [],
+    },
+    {
+      "name": "Akasan",
+      "pri": 750.0,
+      "stock": 20,
+      "available": true,
+      "supplements": [],
+    },
+    {
+      "name": "Taso Kabrit",
+      "pri": 2000.0,
+      "stock": 8,
       "available": true,
       "supplements": [],
     },
@@ -874,11 +1363,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   onPressed: () {
                     if (_staffNameController.text.isNotEmpty) {
                       setState(() {
-                        Map<String, String> staffData = {
+                        Map<String, dynamic> staffData = {
                           "name": _staffNameController.text,
                           "role": _selectedRole,
                           "phone": _staffPhoneController.text,
                           "address": _staffAddressController.text,
+                          "isAvailable": index == null
+                              ? true
+                              : (staffList[index]['isAvailable'] as bool? ?? true),
                         };
                         if (index == null) {
                           staffList.add(staffData);
@@ -974,11 +1466,515 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // =================================================================
+  //  DIALOG DEPANS
+  // =================================================================
+  void _showAddExpenseDialog() {
+    final descCtrl = TextEditingController();
+    final amountCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (dlg) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        icon: const Icon(Icons.remove_circle_outline_rounded,
+            color: Colors.red, size: 36),
+        title: const Text("Ajoute Depans", textAlign: TextAlign.center),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: descCtrl,
+              decoration: const InputDecoration(
+                labelText: "Deskripsyon",
+                prefixIcon: Icon(Icons.description_outlined),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: amountCtrl,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: "Montan (HTG)",
+                prefixIcon: Icon(Icons.payments_outlined),
+              ),
+            ),
+          ],
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        actions: [
+          OutlinedButton(
+            onPressed: () => Navigator.pop(dlg),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(48),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text("Anile"),
+          ),
+          const SizedBox(height: 8),
+          FilledButton(
+            onPressed: () {
+              final amount = int.tryParse(amountCtrl.text) ?? 0;
+              if (descCtrl.text.trim().isEmpty || amount <= 0) return;
+              Navigator.pop(dlg);
+              setState(() => _expenses.add({
+                    'description': descCtrl.text.trim(),
+                    'amount': amount,
+                  }));
+            },
+            style: FilledButton.styleFrom(
+              minimumSize: const Size.fromHeight(48),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text("Anrejistre"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // =================================================================
+  //  DIALOG BLUETOOTH PRINTER
+  // =================================================================
+  void _showBluetoothPrinterDialog(BuildContext ctx) {
+    // Windows: win_ble requiert un serveur natif — non supporté
+    final isMobile = Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
+
+    showDialog(
+      context: ctx,
+      builder: (dlg) => AlertDialog(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.bluetooth_rounded, color: Color(0xFF1565C0)),
+            SizedBox(width: 10),
+            Text("Enprimant Bluetooth"),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 240,
+          child: isMobile
+              ? FutureBuilder<List<BluetoothInfo>>(
+                  future: PrintBluetoothThermal.pairedBluetooths
+                      .timeout(
+                    const Duration(seconds: 10),
+                    onTimeout: () => [],
+                  ),
+                  builder: (context, snap) {
+                    if (snap.connectionState != ConnectionState.done) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const CircularProgressIndicator(),
+                          const SizedBox(height: 16),
+                          Text("Ap chèche enprimant...",
+                              style: TextStyle(color: Colors.grey[600])),
+                        ],
+                      );
+                    }
+                    final devices = snap.data ?? [];
+                    if (devices.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.bluetooth_disabled_rounded,
+                                size: 48, color: Colors.grey[400]),
+                            const SizedBox(height: 12),
+                            const Text(
+                              "Pa gen enprimant parèye.\nAlè nan Bluetooth Settings pou parèye enprimant la anvan.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    return ListView.separated(
+                      itemCount: devices.length,
+                      separatorBuilder: (context, index) =>
+                          const Divider(height: 1),
+                      itemBuilder: (context, i) {
+                        final dev = devices[i];
+                        final isSelected =
+                            _connectedPrinter?.macAdress == dev.macAdress;
+                        return ListTile(
+                          leading: Icon(
+                            Icons.print_rounded,
+                            color: isSelected
+                                ? Colors.green[700]
+                                : AppPalette.seed,
+                          ),
+                          title: Text(dev.name,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600)),
+                          subtitle: Text(dev.macAdress,
+                              style: const TextStyle(fontSize: 11)),
+                          trailing: isSelected
+                              ? Icon(Icons.check_circle_rounded,
+                                  color: Colors.green[700])
+                              : null,
+                          onTap: () {
+                            setState(() => _connectedPrinter = dev);
+                            Navigator.pop(dlg);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("${dev.name} konekte!"),
+                                backgroundColor: Colors.green[700],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
+                )
+              // Plateforme non-mobile : message explicatif immédiat
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withValues(alpha: .10),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: const Icon(Icons.phone_android_rounded,
+                          size: 48, color: Colors.orange),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      "Enprimant Bluetooth",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w700, fontSize: 15),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "Fonksyon sa a disponib sèlman sou Android ak iOS.\n\nInstale aplikasyon an sou telefòn ou tablèt pou enprime kòmand yo.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                    ),
+                  ],
+                ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dlg),
+            child: const Text("Fèmen"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // =================================================================
+  //  DIALOG PIN
+  // =================================================================
+  void _showPinDialog(BuildContext ctx, {required VoidCallback onSuccess}) {
+    final pinCtrl = TextEditingController();
+    showDialog(
+      context: ctx,
+      builder: (dlg) => AlertDialog(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.lock_rounded, color: AppPalette.seed),
+            SizedBox(width: 10),
+            Text("Antre PIN ou"),
+          ],
+        ),
+        content: TextField(
+          controller: pinCtrl,
+          obscureText: true,
+          keyboardType: TextInputType.number,
+          maxLength: 6,
+          autofocus: true,
+          decoration: const InputDecoration(
+            labelText: "PIN",
+            prefixIcon: Icon(Icons.pin_rounded),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dlg),
+            child: const Text("Anile"),
+          ),
+          FilledButton(
+            onPressed: () {
+              if (pinCtrl.text == _settingsPin) {
+                Navigator.pop(dlg);
+                onSuccess();
+              } else {
+                ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(
+                  content: Text("PIN a pa kòrèk."),
+                  backgroundColor: Colors.red,
+                ));
+              }
+            },
+            child: const Text("Konfime"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // =================================================================
+  //  DIALOG CHANJE / DEFINI PIN
+  // =================================================================
+  void _showSetPinDialog(BuildContext ctx) {
+    final newPinCtrl = TextEditingController();
+    final confirmPinCtrl = TextEditingController();
+    final currentPinCtrl = TextEditingController();
+
+    void doSet() {
+      showDialog(
+        context: ctx,
+        builder: (dlg) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text(_settingsPin.isEmpty ? "Defini PIN" : "Chanje PIN"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_settingsPin.isNotEmpty) ...[
+                TextField(
+                  controller: currentPinCtrl,
+                  obscureText: true,
+                  keyboardType: TextInputType.number,
+                  maxLength: 6,
+                  decoration: const InputDecoration(
+                    labelText: "PIN Aktyèl",
+                    prefixIcon: Icon(Icons.lock_outline_rounded),
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
+              TextField(
+                controller: newPinCtrl,
+                obscureText: true,
+                keyboardType: TextInputType.number,
+                maxLength: 6,
+                autofocus: _settingsPin.isEmpty,
+                decoration: const InputDecoration(
+                  labelText: "Nouvo PIN (4-6 chif)",
+                  prefixIcon: Icon(Icons.pin_rounded),
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: confirmPinCtrl,
+                obscureText: true,
+                keyboardType: TextInputType.number,
+                maxLength: 6,
+                decoration: const InputDecoration(
+                  labelText: "Konfime PIN",
+                  prefixIcon: Icon(Icons.pin_rounded),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dlg),
+              child: const Text("Anile"),
+            ),
+            FilledButton(
+              onPressed: () {
+                if (_settingsPin.isNotEmpty &&
+                    currentPinCtrl.text != _settingsPin) {
+                  ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(
+                    content: Text("PIN Aktyèl la pa kòrèk."),
+                    backgroundColor: Colors.red,
+                  ));
+                  return;
+                }
+                if (newPinCtrl.text.length < 4) {
+                  ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(
+                    content: Text("PIN dwe gen omwen 4 chif."),
+                    backgroundColor: Colors.red,
+                  ));
+                  return;
+                }
+                if (newPinCtrl.text != confirmPinCtrl.text) {
+                  ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(
+                    content: Text("PIN yo pa menm. Reseye."),
+                    backgroundColor: Colors.red,
+                  ));
+                  return;
+                }
+                setState(() => _settingsPin = newPinCtrl.text);
+                Navigator.pop(dlg);
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  SnackBar(
+                    content: const Row(children: [
+                      Icon(Icons.verified_user_rounded, color: Colors.white),
+                      SizedBox(width: 10),
+                      Text("PIN defini avèk siksè!"),
+                    ]),
+                    backgroundColor: Colors.green[700],
+                  ),
+                );
+              },
+              child: const Text("Konfime"),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_settingsPin.isNotEmpty) {
+      _showPinDialog(ctx, onSuccess: doSet);
+    } else {
+      doSet();
+    }
+  }
+
+  // =================================================================
+  //  IMPRESSION THERMIQUE BLUETOOTH
+  // =================================================================
+  Future<void> _printOrder(Map<String, dynamic> o) async {
+    if (_connectedPrinter == null) {
+      _showBluetoothPrinterDialog(context);
+      return;
+    }
+
+    if (!Platform.isAndroid && !Platform.isIOS && !Platform.isMacOS) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text(
+            "Enprimant Bluetooth disponib sou Android ak iOS sèlman."),
+        backgroundColor: Colors.orange,
+      ));
+      return;
+    }
+
+    final connected = await PrintBluetoothThermal.connect(
+      macPrinterAddress: _connectedPrinter!.macAdress,
+    );
+    if (!connected) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content:
+            Text("Koneksyon enprimant la echwe. Reseye."),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
+
+    final supp = (o['suplements'] as List);
+    final suppLines = supp.isNotEmpty
+        ? supp.map((s) => "+ $s").join("\n")
+        : "Okenn";
+    final memo =
+        (o['memo'] as String).isNotEmpty ? o['memo'] as String : "Okenn";
+    final cuisinier = (o['cuisinier'] as String).isNotEmpty
+        ? o['cuisinier'] as String
+        : "-";
+    final dateStr =
+        "${(o['date'] as DateTime).day.toString().padLeft(2, '0')}/"
+        "${(o['date'] as DateTime).month.toString().padLeft(2, '0')}/"
+        "${(o['date'] as DateTime).year} "
+        "${(o['date'] as DateTime).hour.toString().padLeft(2, '0')}:"
+        "${(o['date'] as DateTime).minute.toString().padLeft(2, '0')}";
+
+    const sep = "================================\n";
+    const dash = "--------------------------------\n";
+
+    final body = "$sep"
+        "      SAGAEAT BUSINESS\n"
+        "$sep"
+        "Komand : #ORD-${o['id']}\n"
+        "Dat    : $dateStr\n"
+        "$dash"
+        "Kliyan  : ${o['nom']}\n"
+        "Kizinyè : $cuisinier\n"
+        "$dash"
+        "PLAT\n"
+        "${o['plat']}\n"
+        "$sep"
+        "SIPLEMAN\n"
+        "$suppLines\n"
+        "$sep"
+        "Nòt: $memo\n"
+        "$dash"
+        "Total: ${o['pri']}\n"
+        "$sep"
+        "\n\n\n";
+
+    for (int copy = 1; copy <= 2; copy++) {
+      final ticket = "${body}KOPI $copy/2\n$sep\n\n\n";
+      await PrintBluetoothThermal.writeString(
+        printText: PrintTextSize(size: 1, text: ticket),
+      );
+    }
+
+    await PrintBluetoothThermal.disconnect;
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Row(children: [
+          Icon(Icons.check_circle_rounded, color: Colors.white),
+          SizedBox(width: 10),
+          Text("Kòmand enprime (2 kopi)!"),
+        ]),
+        backgroundColor: Colors.green[700],
+      ),
+    );
+  }
+
+  //  SUPRIME PLAT
+  // =================================================================
+  void _deletePlat(BuildContext ctx, int index) {
+    final name = menuPlats[index]['name'] as String;
+    showDialog(
+      context: ctx,
+      builder: (dlg) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        icon: const Icon(Icons.delete_outline_rounded,
+            color: Colors.red, size: 36),
+        title: const Text("Efase Plat", textAlign: TextAlign.center),
+        content: Text(
+          "Ou sèten ou vle efase « $name » nan meni an ?",
+          textAlign: TextAlign.center,
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        actions: [
+          OutlinedButton(
+            onPressed: () => Navigator.pop(dlg),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(48),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text("Anile"),
+          ),
+          const SizedBox(height: 8),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(dlg);
+              setState(() => menuPlats.removeAt(index));
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red,
+              minimumSize: const Size.fromHeight(48),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text("Wi, efase"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // =================================================================
   //  DIALOG ASIYEN CUISINIER
   // =================================================================
   void _showAssignCuisinierDialog(Map<String, dynamic> o) {
     final cuisiniers =
-        staffList.where((s) => s['role']!.contains("Cuisinier")).toList();
+        staffList.where((s) => s['role']!.contains("Cuisinier") && (s['isAvailable'] as bool? ?? true)).toList();
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -1068,15 +2064,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
       "Meni",
       "Ekip",
       "Istorik",
-      "Profile",
+      "Paramèt",
+      "Finans",
     ];
     final subtitles = [
       "${orders.where((o) => o['status'] != 'Livre' && o['status'] != 'Annulé').length} kòmand aktif",
       "${menuPlats.length} plat nan meni an",
       "${staffList.length} anplwaye",
       "${orders.where((o) => o['status'] == 'Livre' || o['status'] == 'Annulé').length} kòmand fini",
-      _restNameController.text,
+      "Konfigirasyon aplikasyon an",
+      "Rapò finansye",
     ];
+
 
     return Scaffold(
       appBar: AppBar(
@@ -1119,7 +2118,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             _buildMenuPlats(),
             _buildStaff(),
             _buildHistoryTab(),
-            _buildProfileTab(),
+            _buildParametTab(),
+            _buildFinanceTab(),
           ],
         ),
       ),
@@ -1156,10 +2156,402 @@ class _DashboardScreenState extends State<DashboardScreen> {
             label: "Istorik",
           ),
           NavigationDestination(
-            icon: Icon(Icons.storefront_outlined),
-            selectedIcon: Icon(Icons.storefront_rounded),
-            label: "Profile",
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings_rounded),
+            label: "Paramèt",
           ),
+          NavigationDestination(
+            icon: Icon(Icons.bar_chart_outlined),
+            selectedIcon: Icon(Icons.bar_chart_rounded),
+            label: "Finans",
+          ),
+        ],
+      ),
+    );
+  }
+
+  // =================================================================
+  //  ONGLET FINANS
+  // =================================================================
+  Widget _buildFinanceTab() {
+    final range = _effectiveFinanceRange();
+
+    final livreOrders = orders.where((o) {
+      if (o['status'] != "Livre") return false;
+      final DateTime d = (o['date_completed'] ?? o['date']) as DateTime;
+      return !d.isBefore(range.start) &&
+          !d.isAfter(range.end.add(const Duration(days: 1)));
+    }).toList()
+      ..sort((a, b) {
+        final da = (a['date_completed'] ?? a['date']) as DateTime;
+        final db = (b['date_completed'] ?? b['date']) as DateTime;
+        return db.compareTo(da);
+      });
+
+    final annuleCount = orders.where((o) {
+      if (o['status'] != "Annulé") return false;
+      final DateTime d = (o['date_canceled'] ?? o['date']) as DateTime;
+      return !d.isBefore(range.start) &&
+          !d.isAfter(range.end.add(const Duration(days: 1)));
+    }).length;
+
+    final int totalHTG =
+        livreOrders.fold(0, (s, o) => s + _parsePrice(o['pri'] as String));
+    final int avgHTG =
+        livreOrders.isEmpty ? 0 : totalHTG ~/ livreOrders.length;
+
+    final Map<String, int> dailyRevenue = {};
+    for (final o in livreOrders) {
+      final d = (o['date_completed'] ?? o['date']) as DateTime;
+      final key =
+          "${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}";
+      dailyRevenue[key] =
+          (dailyRevenue[key] ?? 0) + _parsePrice(o['pri'] as String);
+    }
+
+    final Map<String, Map<String, dynamic>> platStats = {};
+    for (final o in livreOrders) {
+      final pla = o['pla'] as String;
+      platStats[pla] ??= {'count': 0, 'revenue': 0};
+      platStats[pla]!['count'] = (platStats[pla]!['count'] as int) + 1;
+      platStats[pla]!['revenue'] = (platStats[pla]!['revenue'] as int) +
+          _parsePrice(o['pri'] as String);
+    }
+    final top3 = (platStats.entries.toList()
+          ..sort((a, b) => (b.value['revenue'] as int)
+              .compareTo(a.value['revenue'] as int)))
+        .take(3)
+        .toList();
+
+    final cs = Theme.of(context).colorScheme;
+    final rangeLabel = _financeDateRange != null
+        ? "${_financeDateRange!.start.day.toString().padLeft(2, '0')}/${_financeDateRange!.start.month.toString().padLeft(2, '0')} – ${_financeDateRange!.end.day.toString().padLeft(2, '0')}/${_financeDateRange!.end.month.toString().padLeft(2, '0')}"
+        : _financeQuickFilter;
+    const medals = ["🥇", "🥈", "🥉"];
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Filtre rapide
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (final label in ["Jodi a", "7 Jou", "Mwa Sa", "Tout"])
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: _SortChip(
+                      label: label,
+                      selected: _financeDateRange == null &&
+                          _financeQuickFilter == label,
+                      onTap: () => setState(() {
+                        _financeQuickFilter = label;
+                        _financeDateRange = null;
+                      }),
+                    ),
+                  ),
+                Material(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(14),
+                    onTap: () async {
+                      final picked = await showDateRangePicker(
+                        context: context,
+                        firstDate: DateTime(2024),
+                        lastDate: DateTime(2030),
+                      );
+                      if (picked != null) {
+                        setState(() => _financeDateRange = picked);
+                      }
+                    },
+                    child: Container(
+                      width: 44,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: cs.outlineVariant.withValues(alpha: .5),
+                        ),
+                      ),
+                      child: Icon(Icons.date_range_rounded,
+                          size: 18,
+                          color: _financeDateRange != null
+                              ? AppPalette.seed
+                              : Colors.grey[600]),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Carte Revni Total
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: cs.primaryContainer,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.bar_chart_rounded, color: cs.primary, size: 22),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Revni Total",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: cs.onPrimaryContainer,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _formatHTG(totalHTG),
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w800,
+                    color: cs.primary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Peryòd : $rangeLabel",
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: cs.onPrimaryContainer.withValues(alpha: .7)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // StatPills — Livre + Anile en ligne, Mwayèn pleine largeur
+          Row(
+            children: [
+              Expanded(
+                child: _StatPill(
+                  icon: Icons.check_circle_rounded,
+                  label: "Kòmand Livre",
+                  value: "${livreOrders.length}",
+                  color: Colors.green[700]!,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _StatPill(
+                  icon: Icons.cancel_rounded,
+                  label: "Kòmand Anile",
+                  value: "$annuleCount",
+                  color: Colors.red[700]!,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          _StatPill(
+            icon: Icons.payments_rounded,
+            label: "Mwayèn pa Kòmand",
+            value: _formatHTG(avgHTG),
+            color: AppPalette.seed,
+          ),
+          const SizedBox(height: 20),
+
+          // Graphique par jour
+          _SectionHeader(
+              icon: Icons.bar_chart_outlined, title: "Revni pa Jou"),
+          const SizedBox(height: 12),
+          if (dailyRevenue.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Text(
+                "Pa gen done pou peryòd sa a.",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey[500], fontSize: 13),
+              ),
+            )
+          else
+            _FinanceBarChart(
+              data: range.end.difference(range.start).inDays > 14
+                  ? _groupByWeek(dailyRevenue)
+                  : dailyRevenue,
+            ),
+          const SizedBox(height: 20),
+
+          // Top 3 plats
+          _SectionHeader(
+              icon: Icons.restaurant_rounded, title: "Top Plat yo"),
+          const SizedBox(height: 8),
+          if (top3.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Text(
+                "Pa gen done pou peryòd sa a.",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey[500], fontSize: 13),
+              ),
+            )
+          else
+            ...top3.asMap().entries.map((entry) {
+              final i = entry.key;
+              final e = entry.value;
+              return Card(
+                margin: const EdgeInsets.only(bottom: 8),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
+                child: ListTile(
+                  leading:
+                      Text(medals[i], style: const TextStyle(fontSize: 22)),
+                  title: Text(e.key,
+                      style:
+                          const TextStyle(fontWeight: FontWeight.w600)),
+                  subtitle: Text("${e.value['count']} kòmand"),
+                  trailing: Text(
+                    _formatHTG(e.value['revenue'] as int),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppPalette.seed,
+                        fontSize: 13),
+                  ),
+                ),
+              );
+            }),
+          const SizedBox(height: 8),
+
+          // Bouton Pèfòmans Livreur
+          OutlinedButton.icon(
+            icon: const Icon(Icons.delivery_dining_rounded),
+            label: const Text("Wè Pèfòmans Livreur yo"),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(48),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14)),
+            ),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => _LivreurPerfScreen(
+                  livreOrders: livreOrders,
+                  range: range,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Section Dépenses
+          _SectionHeader(
+            icon: Icons.remove_circle_outline_rounded,
+            title: "Depans",
+            trailing: IconButton(
+              icon: const Icon(Icons.add_circle_rounded,
+                  color: AppPalette.seed, size: 22),
+              onPressed: () => _showAddExpenseDialog(),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+          ),
+          const SizedBox(height: 8),
+          if (_expenses.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Text(
+                "Pa gen depans anrejistre.",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey[500], fontSize: 13,
+                    fontStyle: FontStyle.italic),
+              ),
+            )
+          else ...[
+            ..._expenses.map((exp) => Card(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
+                  child: ListTile(
+                    leading: const CircleAvatar(
+                      backgroundColor: Color(0xFFFFEBEE),
+                      child: Icon(Icons.remove_circle_outline_rounded,
+                          color: Colors.red, size: 20),
+                    ),
+                    title: Text(exp['description'] as String,
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          _formatHTG(exp['amount'] as int),
+                          style: const TextStyle(
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline_rounded,
+                              color: Colors.red, size: 18),
+                          onPressed: () =>
+                              setState(() => _expenses.remove(exp)),
+                        ),
+                      ],
+                    ),
+                  ),
+                )),
+            _StatPill(
+              icon: Icons.account_balance_wallet_rounded,
+              label: "Benefis Net",
+              value: _formatHTG(
+                  totalHTG - _expenses.fold(0, (s, e) => s + (e['amount'] as int))),
+              color: (totalHTG - _expenses.fold(0, (s, e) => s + (e['amount'] as int))) >= 0
+                  ? Colors.green[700]!
+                  : Colors.red[700]!,
+            ),
+          ],
+          const SizedBox(height: 20),
+
+          // Liste commandes livrées
+          _SectionHeader(
+              icon: Icons.list_alt_rounded,
+              title: "Détay Kòmand Livre yo"),
+          const SizedBox(height: 8),
+          if (livreOrders.isEmpty)
+            const _EmptyState(
+              icon: Icons.inbox_rounded,
+              title: "Pa gen kòmand livre",
+              message: "Pa gen kòmand livre pou peryòd sa a.",
+            )
+          else
+            ...livreOrders.map((o) {
+              final DateTime d =
+                  (o['date_completed'] ?? o['date']) as DateTime;
+              return Card(
+                margin: const EdgeInsets.only(bottom: 8),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
+                child: ListTile(
+                  leading: _Avatar(name: o['name'] as String),
+                  title: Text(o['name'] as String,
+                      style:
+                          const TextStyle(fontWeight: FontWeight.w600)),
+                  subtitle: Text(_formatDate(d),
+                      style: const TextStyle(fontSize: 12)),
+                  trailing: Text(
+                    o['pri'] as String,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppPalette.seed,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              );
+            }),
         ],
       ),
     );
@@ -1261,7 +2653,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   onTap: () async {
                     DateTimeRange? picked = await showDateRangePicker(
                       context: context,
-                      firstDate: DateTime(2026),
+                      firstDate: DateTime(2024),
                       lastDate: DateTime(2030),
                     );
                     if (picked != null) setState(() => _dateRange = picked);
@@ -1388,7 +2780,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ? null
                     : o['livreur'],
                 items: staffList
-                    .where((s) => s['role']!.contains("Livreur"))
+                    .where((s) => s['role']!.contains("Livreur") && (s['isAvailable'] as bool? ?? true))
                     .map((s) => DropdownMenuItem<String>(
                           value: s['name'],
                           child: Text(s['name']!),
@@ -1477,7 +2869,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   Expanded(
                     child: FilledButton.icon(
-                      icon: const Icon(Icons.restaurant_menu_rounded, size: 18),
+                      icon: const Icon(Icons.restaurant_menu_rounded,
+                          size: 18),
                       label: const Text("Mete Disponib"),
                       style: FilledButton.styleFrom(
                         minimumSize: const Size.fromHeight(44),
@@ -1499,7 +2892,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         style: TextStyle(color: Colors.red)),
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size(0, 44),
-                      side: BorderSide(color: Colors.red.withValues(alpha: .4)),
+                      side: BorderSide(
+                          color: Colors.red.withValues(alpha: .4)),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
                     ),
@@ -1507,6 +2901,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ],
               ),
+            if (status == "Disponible" && (o['livreur'] as String).isEmpty)
+              _InlineHint(
+                icon: Icons.info_outline_rounded,
+                text: "Asiyen yon livreur anvan ou ka voye livrezon an.",
+              ),
+            if (status == "Disponible") const SizedBox(height: 8),
             if (status == "Disponible")
               Row(
                 children: [
@@ -1727,7 +3127,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           subtitle: Padding(
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
-                              "${plat['pri']} HTG • Max ${totalPriceWithSupps.toStringAsFixed(0)} HTG",
+                              "${_formatHTG((plat['pri'] as double).toInt())} • Max ${_formatHTG(totalPriceWithSupps.toInt())}",
                               style: TextStyle(
                                 fontSize: 12.5,
                                 color: Colors.grey[600],
@@ -1766,6 +3166,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 color: AppPalette.seed,
                                 onPressed: () =>
                                     _showPlatForm(index: originalIndex),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline_rounded,
+                                    color: Colors.red),
+                                onPressed: () =>
+                                    _deletePlat(context, originalIndex),
                               ),
                             ],
                           ),
@@ -1912,6 +3318,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
                 IconButton(
+                  icon: Icon(
+                    (employee['isAvailable'] as bool? ?? true)
+                        ? Icons.check_circle_rounded
+                        : Icons.cancel_rounded,
+                    color: (employee['isAvailable'] as bool? ?? true)
+                        ? Colors.green[600]
+                        : Colors.grey[400],
+                  ),
+                  tooltip: (employee['isAvailable'] as bool? ?? true)
+                      ? "Disponib"
+                      : "Pa Disponib",
+                  onPressed: () => setState(() {
+                    employee['isAvailable'] =
+                        !(employee['isAvailable'] as bool? ?? true);
+                  }),
+                ),
+                IconButton(
                   icon: const Icon(Icons.edit_outlined),
                   color: AppPalette.seed,
                   onPressed: () => _showStaffForm(index: index),
@@ -1963,8 +3386,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                             BorderRadius.circular(12)),
                                   ),
                                   onPressed: () {
-                                    setState(() => staffList.removeAt(index));
                                     Navigator.pop(ctx);
+                                    setState(() {
+                                      final name = staffList[index]['name']!;
+                                      staffList.removeAt(index);
+                                      for (final o in orders) {
+                                        if (o['cuisinier'] == name) o['cuisinier'] = "";
+                                        if (o['livreur'] == name) o['livreur'] = "";
+                                      }
+                                    });
                                   },
                                   child: const Text("Wi, efase"),
                                 ),
@@ -1990,10 +3420,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildHistoryTab() {
     List<Map<String, dynamic>> historyOrders = orders.where((o) {
       bool isFinished = o['status'] == "Livre" || o['status'] == "Annulé";
-      bool dateMatch = _historyDateRange == null ||
-          (o['date'].isAfter(_historyDateRange!.start) &&
-              o['date'].isBefore(
-                  _historyDateRange!.end.add(const Duration(days: 1))));
+      bool dateMatch = true;
+      if (_historyDateRange != null) {
+        final DateTime effectiveDate = o['status'] == "Livre"
+            ? ((o['date_completed'] as DateTime?) ?? o['date'] as DateTime)
+            : ((o['date_canceled'] as DateTime?) ?? o['date'] as DateTime);
+        dateMatch = effectiveDate.isAfter(_historyDateRange!.start) &&
+            effectiveDate.isBefore(
+                _historyDateRange!.end.add(const Duration(days: 1)));
+      }
       bool employeeMatch = _historyEmployeeFilter == "Tout" ||
           o['cuisinier'] == _historyEmployeeFilter ||
           o['livreur'] == _historyEmployeeFilter;
@@ -2032,7 +3467,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   onTap: () async {
                     DateTimeRange? picked = await showDateRangePicker(
                       context: context,
-                      firstDate: DateTime(2026),
+                      firstDate: DateTime(2024),
                       lastDate: DateTime(2030),
                     );
                     if (picked != null) {
@@ -2210,10 +3645,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                   fontSize: 12)),
                                           const SizedBox(height: 4),
                                           Text(
-                                            o['cancel_reason'],
+                                            (o['cancel_reason'] as String).isEmpty
+                                                ? "Pa gen rezon ki bay"
+                                                : o['cancel_reason'] as String,
                                             style: TextStyle(
-                                                color: Colors.red[900],
-                                                fontSize: 13),
+                                                color: (o['cancel_reason'] as String).isEmpty
+                                                    ? Colors.grey[500]
+                                                    : Colors.red[900],
+                                                fontSize: 13,
+                                                fontStyle: (o['cancel_reason'] as String).isEmpty
+                                                    ? FontStyle.italic
+                                                    : FontStyle.normal),
                                           ),
                                         ],
                                       ),
@@ -2236,13 +3678,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // =================================================================
   //  ONGLET PROFILE
   // =================================================================
-  Widget _buildProfileTab() {
+  Widget _buildParametTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // En-tête restaurant
+          // En-tête
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -2259,7 +3701,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Icon(Icons.storefront_rounded,
+                    child: const Icon(Icons.settings_rounded,
                         color: Colors.white, size: 28),
                   ),
                   const SizedBox(width: 14),
@@ -2268,13 +3710,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _restNameController.text,
+                          _restNameController.text.isEmpty
+                              ? "SagaEat"
+                              : _restNameController.text,
                           style: const TextStyle(
                               fontSize: 18, fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          "Restoran • ${_deliveryZones.length} zòn livrezon",
+                          "Paramèt ak Konfigirasyon",
                           style: TextStyle(
                               color: Colors.grey[600], fontSize: 12.5),
                         ),
@@ -2286,13 +3730,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
           const SizedBox(height: 16),
+
+          // ── PROFIL RESTORAN ──────────────────────────────────────
           _ProfileSection(
-            icon: Icons.info_outline_rounded,
-            title: "Enfòmasyon Restoran",
+            icon: Icons.storefront_outlined,
+            title: "Profil Restoran",
             children: [
               TextField(
                 controller: _restNameController,
-                enabled: false,
                 decoration: const InputDecoration(
                   labelText: "Non Restoran",
                   prefixIcon: Icon(Icons.storefront_outlined),
@@ -2307,14 +3752,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   alignLabelWithHint: true,
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _ProfileSection(
-            icon: Icons.phone_outlined,
-            title: "Nimewo Telefòn",
-            subtitle: "Max 3 nimewo",
-            children: [
+              const SizedBox(height: 16),
+              const Divider(),
+              const SizedBox(height: 8),
+              // Phones
+              Row(
+                children: [
+                  Icon(Icons.phone_outlined,
+                      color: AppPalette.seed, size: 18),
+                  const SizedBox(width: 8),
+                  const Text("Nimewo Telefòn",
+                      style: TextStyle(fontWeight: FontWeight.w600)),
+                  const Spacer(),
+                  Text("Max 3",
+                      style: TextStyle(
+                          color: Colors.grey[500], fontSize: 12)),
+                ],
+              ),
+              const SizedBox(height: 10),
               ..._phones.asMap().entries.map(
                     (entry) => Padding(
                       padding: const EdgeInsets.only(bottom: 8),
@@ -2326,7 +3781,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               keyboardType: TextInputType.phone,
                               decoration: InputDecoration(
                                 labelText: "Telefòn ${entry.key + 1}",
-                                prefixIcon: const Icon(Icons.phone_outlined),
+                                prefixIcon:
+                                    const Icon(Icons.phone_outlined),
                               ),
                               onChanged: (v) => _phones[entry.key] = v,
                             ),
@@ -2351,13 +3807,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     onPressed: () => setState(() => _phones.add("")),
                   ),
                 ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _ProfileSection(
-            icon: Icons.location_on_outlined,
-            title: "Adrès Etablisman",
-            children: [
+              const SizedBox(height: 8),
+              const Divider(),
+              const SizedBox(height: 8),
+              // Address
+              Row(
+                children: [
+                  Icon(Icons.location_on_outlined,
+                      color: AppPalette.seed, size: 18),
+                  const SizedBox(width: 8),
+                  const Text("Adrès Etablisman",
+                      style: TextStyle(fontWeight: FontWeight.w600)),
+                ],
+              ),
+              const SizedBox(height: 10),
               DropdownButtonFormField<String>(
                 isExpanded: true,
                 decoration: const InputDecoration(
@@ -2366,7 +3829,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 initialValue: _selectedDept,
                 items: _haitiData.keys
-                    .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                    .map((d) =>
+                        DropdownMenuItem(value: d, child: Text(d)))
                     .toList(),
                 onChanged: (v) => setState(() {
                   _selectedDept = v;
@@ -2382,9 +3846,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 initialValue: _selectedCommune,
                 items: (_haitiData[_selectedDept] ?? [])
-                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                    .map((c) =>
+                        DropdownMenuItem(value: c, child: Text(c)))
                     .toList(),
-                onChanged: (v) => setState(() => _selectedCommune = v),
+                onChanged: (v) =>
+                    setState(() => _selectedCommune = v),
               ),
               const SizedBox(height: 10),
               TextField(
@@ -2394,16 +3860,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   prefixIcon: Icon(Icons.home_outlined),
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _ProfileSection(
-            icon: Icons.local_shipping_outlined,
-            title: "Zòn Livrezon",
-            subtitle:
-                "Koche sèlman komin kote restoran an ka livre an sekirite",
-            accent: Colors.red[700],
-            children: [
+              const SizedBox(height: 8),
+              const Divider(),
+              const SizedBox(height: 8),
+              // Delivery zones
+              Row(
+                children: [
+                  Icon(Icons.local_shipping_outlined,
+                      color: Colors.red[700], size: 18),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text("Zòn Livrezon",
+                        style: TextStyle(fontWeight: FontWeight.w600)),
+                  ),
+                  Text("${_deliveryZones.length} chwazi",
+                      style: TextStyle(
+                          color: Colors.grey[500], fontSize: 12)),
+                ],
+              ),
+              const SizedBox(height: 10),
               if (_deliveryZones.isNotEmpty)
                 Container(
                   width: double.infinity,
@@ -2427,7 +3902,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
                 ),
-              ..._haitiData.keys.map((dept) {
+              TextField(
+                decoration: InputDecoration(
+                  hintText: "Chèche yon komin...",
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  isDense: true,
+                  suffixIcon: _zoneSearchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear_rounded),
+                          onPressed: () =>
+                              setState(() => _zoneSearchQuery = ""),
+                        )
+                      : null,
+                ),
+                onChanged: (v) =>
+                    setState(() => _zoneSearchQuery = v.toLowerCase()),
+              ),
+              const SizedBox(height: 8),
+              ..._haitiData.keys.where((dept) {
+                if (_zoneSearchQuery.isEmpty) return true;
+                if (dept.toLowerCase().contains(_zoneSearchQuery)) {
+                  return true;
+                }
+                return _haitiData[dept]!
+                    .any((c) => c.toLowerCase().contains(_zoneSearchQuery));
+              }).map((dept) {
                 final selectedInDept = _haitiData[dept]!
                     .where((c) => _deliveryZones.contains(c))
                     .length;
@@ -2443,11 +3942,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: ExpansionTile(
                       shape: const Border(),
                       collapsedShape: const Border(),
-                      title: Text(
-                        dept,
-                        style:
-                            const TextStyle(fontWeight: FontWeight.w600),
-                      ),
+                      title: Text(dept,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w600)),
                       trailing: selectedInDept > 0
                           ? Container(
                               padding: const EdgeInsets.symmetric(
@@ -2456,13 +3953,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 color: AppPalette.seed,
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: Text(
-                                "$selectedInDept",
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 11),
-                              ),
+                              child: Text("$selectedInDept",
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 11)),
                             )
                           : const Icon(Icons.expand_more),
                       children: _haitiData[dept]!.map((commune) {
@@ -2488,24 +3983,254 @@ class _DashboardScreenState extends State<DashboardScreen> {
               }),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
           FilledButton.icon(
             icon: const Icon(Icons.save_rounded),
-            label: const Text("Sove Chanjman yo"),
+            label: const Text("Sove Profil"),
             onPressed: () {
+              if (_restNameController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text("Non restoran an obligatwa."),
+                  backgroundColor: Colors.red,
+                ));
+                return;
+              }
+              if (_phones.every((p) => p.trim().isEmpty)) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text("Bay omwen yon nimewo telefon."),
+                  backgroundColor: Colors.red,
+                ));
+                return;
+              }
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: const Row(
                     children: [
                       Icon(Icons.check_circle_rounded, color: Colors.white),
                       SizedBox(width: 10),
-                      Text("Profile Mizajou avèk Siksè!"),
+                      Text("Profil Mizajou avek Siksè!"),
                     ],
                   ),
                   backgroundColor: Colors.green[700],
                 ),
               );
             },
+          ),
+          const SizedBox(height: 16),
+
+          // ── PEMAN ────────────────────────────────────────────────
+          _ProfileSection(
+            icon: Icons.payment_rounded,
+            title: "Pèman",
+            subtitle: "Metod retray ak pèman",
+            children: [
+              _PayLabel(label: "Moncash", color: const Color(0xFFE53935)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _moncashCtrl,
+                keyboardType: TextInputType.phone,
+                decoration: const InputDecoration(
+                  labelText: "Nimewo Moncash",
+                  prefixIcon: Icon(Icons.phone_android_rounded),
+                ),
+              ),
+              const SizedBox(height: 14),
+              _PayLabel(label: "Natcash", color: const Color(0xFF1565C0)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _natcashCtrl,
+                keyboardType: TextInputType.phone,
+                decoration: const InputDecoration(
+                  labelText: "Nimewo Natcash",
+                  prefixIcon: Icon(Icons.phone_android_rounded),
+                ),
+              ),
+              const SizedBox(height: 14),
+              _PayLabel(
+                  label: "Kont Bankè",
+                  color: const Color(0xFF37474F),
+                  icon: Icons.account_balance_rounded),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _bankNameCtrl,
+                decoration: const InputDecoration(
+                  labelText: "Non Bank lan",
+                  prefixIcon: Icon(Icons.account_balance_outlined),
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _bankAccountCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: "Nimewo Kont",
+                  prefixIcon: Icon(Icons.numbers_rounded),
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _bankHolderCtrl,
+                decoration: const InputDecoration(
+                  labelText: "Non Titilè Kont",
+                  prefixIcon: Icon(Icons.person_outline_rounded),
+                ),
+              ),
+              const SizedBox(height: 16),
+              FilledButton.icon(
+                icon: const Icon(Icons.save_rounded),
+                label: const Text("Sove Pèman"),
+                style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48)),
+                onPressed: () {
+                  void doSave() {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Row(children: [
+                          Icon(Icons.check_circle_rounded,
+                              color: Colors.white),
+                          SizedBox(width: 10),
+                          Text("Enfòmasyon Pèman Sove!"),
+                        ]),
+                        backgroundColor: Colors.green[700],
+                      ),
+                    );
+                  }
+
+                  if (_settingsPin.isEmpty) {
+                    doSave();
+                  } else {
+                    _showPinDialog(context, onSuccess: doSave);
+                  }
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // ── ENPRIMANT BLUETOOTH ──────────────────────────────────
+          _ProfileSection(
+            icon: Icons.print_rounded,
+            title: "Enprimant Bluetooth",
+            subtitle: "Konekte enprimant tèmik la",
+            children: [
+              if (_connectedPrinter != null) ...[
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withValues(alpha: .08),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.check_circle_rounded,
+                          color: Colors.green[700], size: 22),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(_connectedPrinter!.name,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w700)),
+                            Text(_connectedPrinter!.macAdress,
+                                style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey[600])),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.bluetooth_disabled_rounded,
+                      size: 18),
+                  label: const Text("Dekonekte"),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.red,
+                    side: BorderSide(color: Colors.red.withValues(alpha: .4)),
+                    minimumSize: const Size.fromHeight(44),
+                  ),
+                  onPressed: () async {
+                    await PrintBluetoothThermal.disconnect;
+                    setState(() => _connectedPrinter = null);
+                  },
+                ),
+              ] else ...[
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: .08),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.print_disabled_rounded,
+                          color: Colors.grey[500], size: 22),
+                      const SizedBox(width: 10),
+                      Text("Pa gen enprimant konekte",
+                          style: TextStyle(color: Colors.grey[600])),
+                    ],
+                  ),
+                ),
+              ],
+              const SizedBox(height: 10),
+              FilledButton.icon(
+                icon: const Icon(Icons.bluetooth_searching_rounded, size: 18),
+                label: const Text("Chèche Enprimant"),
+                style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48)),
+                onPressed: () => _showBluetoothPrinterDialog(context),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // ── SEKIRITE ─────────────────────────────────────────────
+          _ProfileSection(
+            icon: Icons.lock_outline_rounded,
+            title: "Sekirite",
+            subtitle: "PIN pou pwoteje modifikasyon",
+            children: [
+              Text(
+                "PIN sa a pwoteje chanjman nan Pèman ak Paramèt yo.",
+                style: TextStyle(color: Colors.grey[600], fontSize: 13),
+              ),
+              const SizedBox(height: 4),
+              if (_settingsPin.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withValues(alpha: .08),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.verified_user_rounded,
+                          color: Colors.green[700], size: 18),
+                      const SizedBox(width: 8),
+                      Text("PIN aktive",
+                          style: TextStyle(
+                              color: Colors.green[700],
+                              fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                ),
+              const SizedBox(height: 12),
+              FilledButton.icon(
+                icon: Icon(_settingsPin.isEmpty
+                    ? Icons.add_moderator_rounded
+                    : Icons.edit_rounded,
+                    size: 18),
+                label: Text(
+                    _settingsPin.isEmpty ? "Defini PIN" : "Chanje PIN"),
+                style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48)),
+                onPressed: () => _showSetPinDialog(context),
+              ),
+            ],
           ),
           const SizedBox(height: 24),
         ],
@@ -3043,19 +4768,17 @@ class _ProfileSection extends StatelessWidget {
   final IconData icon;
   final String title;
   final String? subtitle;
-  final Color? accent;
   final List<Widget> children;
   const _ProfileSection({
     required this.icon,
     required this.title,
     this.subtitle,
-    this.accent,
     required this.children,
   });
 
   @override
   Widget build(BuildContext context) {
-    final c = accent ?? AppPalette.seed;
+    const c = AppPalette.seed;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -3101,6 +4824,181 @@ class _ProfileSection extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _FinanceBarChart extends StatelessWidget {
+  final Map<String, int> data;
+  const _FinanceBarChart({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    if (data.isEmpty) return const SizedBox.shrink();
+    final maxVal = data.values.reduce((a, b) => a > b ? a : b);
+    final cs = Theme.of(context).colorScheme;
+    return SizedBox(
+      height: 140,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: data.entries.map((e) {
+          final ratio = maxVal == 0 ? 0.0 : e.value / maxVal;
+          return Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    _short(e.value),
+                    style: TextStyle(
+                        fontSize: 9,
+                        color: cs.primary,
+                        fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 2),
+                  Container(
+                    height: (ratio * 90).clamp(4.0, 90.0),
+                    decoration: BoxDecoration(
+                      color: cs.primary,
+                      borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(6)),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(e.key,
+                      style: const TextStyle(
+                          fontSize: 9, color: Colors.grey)),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  String _short(int v) =>
+      v >= 1000 ? "${(v / 1000).toStringAsFixed(1)}k" : "$v";
+}
+
+class _LivreurPerfScreen extends StatelessWidget {
+  final List<Map<String, dynamic>> livreOrders;
+  final DateTimeRange range;
+  const _LivreurPerfScreen(
+      {required this.livreOrders, required this.range});
+
+  static int _parsePrice(String pri) =>
+      int.tryParse(pri.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+
+  static String _formatHTG(int amount) {
+    final s = amount.toString();
+    final result = StringBuffer();
+    for (int i = 0; i < s.length; i++) {
+      if (i > 0 && (s.length - i) % 3 == 0) result.write(',');
+      result.write(s[i]);
+    }
+    return 'HTG $result';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Map<String, Map<String, dynamic>> stats = {};
+    for (final o in livreOrders) {
+      final liv = (o['livreur'] as String).isEmpty
+          ? "Non défini"
+          : o['livreur'] as String;
+      stats[liv] ??= {'count': 0, 'revenue': 0};
+      stats[liv]!['count'] = (stats[liv]!['count'] as int) + 1;
+      stats[liv]!['revenue'] = (stats[liv]!['revenue'] as int) +
+          _parsePrice(o['pri'] as String);
+    }
+    final entries = stats.entries.toList()
+      ..sort((a, b) =>
+          (b.value['count'] as int).compareTo(a.value['count'] as int));
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("Pèfòmans Livreur")),
+      body: entries.isEmpty
+          ? const _EmptyState(
+              icon: Icons.delivery_dining_rounded,
+              title: "Pa gen done",
+              message: "Pa gen livrezon pou peryòd sa a.",
+            )
+          : ListView.separated(
+              padding: const EdgeInsets.all(16),
+              itemCount: entries.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 12),
+              itemBuilder: (ctx, i) {
+                final e = entries[i];
+                return Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor:
+                          AppPalette.seed.withValues(alpha: .15),
+                      child: Text(
+                        "${i + 1}",
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: AppPalette.seed),
+                      ),
+                    ),
+                    title: Text(e.key,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w600)),
+                    subtitle: Text("${e.value['count']} livrezon"),
+                    trailing: Text(
+                      _formatHTG(e.value['revenue'] as int),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppPalette.seed,
+                          fontSize: 14),
+                    ),
+                  ),
+                );
+              },
+            ),
+    );
+  }
+}
+
+// =====================================================================
+//  WIDGET POU SEKSYON PEMAN
+// =====================================================================
+class _PayLabel extends StatelessWidget {
+  final String label;
+  final Color color;
+  final IconData icon;
+  const _PayLabel({
+    required this.label,
+    required this.color,
+    this.icon = Icons.phone_android_rounded,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: .12),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color, size: 16),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            color: color,
+            fontSize: 13,
+          ),
+        ),
+      ],
     );
   }
 }

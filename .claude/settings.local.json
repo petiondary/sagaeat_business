@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter pub *)",
+      "Bash(findstr /i \"win_ble\\\\|win_server\\\\|win_file\")",
+      "Bash(powershell -Command \"Select-String -Path 'c:\\\\Users\\\\richa\\\\Documents\\\\Sagacetech\\\\App SagaEat\\\\sagaeat_business\\\\.dart_tool\\\\package_config.json' -Pattern '3.38.5|3.44.0' | Select-Object -First 3\")"
+    ]
+  }
+}
